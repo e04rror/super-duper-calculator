@@ -21,7 +21,7 @@ bool check_multiply_division(char symbol);
 // for choosing operation
 double (*ch_operation(char operator))(double, double);
 
-double calculation(int argc, char **argv);
+double calculation(char *string);
 
 #endif
 

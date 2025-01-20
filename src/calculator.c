@@ -1,5 +1,5 @@
 #include "calculator.h"
-#include <stdlib.h> // for exit and atof
+#include <stdlib.h> // for exit and strtod
 #include <stdio.h> // for fprintf and stderr
 
 // for addition
@@ -42,46 +42,31 @@ double (*ch_operation(char operator))(double, double){
 	}
 }
 
-double calculation(int argc, char **argv){
-	
-	double result = atof(argv[1]);
-	double next_number = 0;
-	double (*operation)(double, double) = NULL;
-	bool calculation_multiply_division = false;
-    int counter_priority_operations = 0;
-    
-	for(int i = 2; i < argc; i+=2){	
-        if((i+2) < argc && check_multiply_division(argv[i+2][0])) {
-            calculation_multiply_division = true;
-            counter_priority_operations+=2;
-            continue;
-        }
-
-        if(calculation_multiply_division){
+double calculation(char *string){
+    double result = 0.0f,
+           number = 0;
+    double (*operation)(double, double) = add;
+    char *current = string; 
+    char  *end_number;
+    while(*current != '\0'){
+        number = strtod(current, &end_number);
+        if(current != end_number){
             
-            double priority_calculation = atof(argv[i-1]);
-            next_number = atof(argv[i+1]);
-            operation = ch_operation(argv[i][0]);
-            priority_calculation = operation(priority_calculation, next_number);
-            for(int index_prev_oper = 2; index_prev_oper < counter_priority_operations; index_prev_oper+=2){
-                
-                int index = i - index_prev_oper;
-                operation = ch_operation(argv[index][0]);
-                double previous_number = atof(argv[index - 1]);
-                priority_calculation = operation(previous_number, priority_calculation);
+            result = operation(result, number);
+            
+            current = end_number;
+            
+            if(ch_operation(*end_number)){
+                operation = ch_operation(*end_number);
+                current++;
             }
-
-            operation = ch_operation(argv[i-counter_priority_operations][0]);
-            result = operation(result, priority_calculation);
-            calculation_multiply_division = false;
-            counter_priority_operations = 0;
-        
-        } else {
-		    operation = ch_operation(argv[i][0]);
-		    next_number = atof(argv[i+1]);
-		    result = operation(result, next_number);
-	    }
-
+        }else if(ch_operation(*current)){
+            operation = ch_operation(*current);
+            current++;
+        }else {
+            current++;
+        }
     }
-	return result;
+
+    return result;
 }
