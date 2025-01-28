@@ -84,8 +84,10 @@ double calculation(char *string){
     char operations[MAX_AMOUNT];
     size_t amount_numbers = 0, amount_operations = 0;
     
-    while(*current != '\0'){   
-        number = strtod(current, &end_number);
+
+    while(*current != '\0'){
+
+       number = strtod(current, &end_number);
        if(current != end_number){
             numbers[amount_numbers++] = number;
             current = end_number;
@@ -95,7 +97,7 @@ double calculation(char *string){
                 current++;
             }
         } else if(ch_operation(*current)){ // what if someone enter the phrase like this "1+-/2"
-            operations[amount_operations] = *end_number; 
+            operations[amount_operations] = *current; 
             current++;
         
         } else {
@@ -104,13 +106,13 @@ double calculation(char *string){
     }
     operations[amount_operations] = '\0';
 
-    /*for(size_t i = 0; i < amount_numbers;i++){
+    for(size_t i = 0; i < amount_numbers;i++){
         printf("%f ", numbers[i]);
         if(operations[i]!= '\0'){
             printf("%c", operations[i]); 
         }
         printf("\n");
-    }*/
+    }
 
     double result = 0.0f;
     result = multi_division(numbers, operations, amount_operations);
