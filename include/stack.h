@@ -6,25 +6,25 @@
 typedef struct Node {
     char operation;
     struct Node *next;
-} Node;
+} node_op;
 
 // create new Node
-Node *create_node(char data);
+node_op *create_node(char data);
 
-typedef struct Stack {
-    Node *head;
-} Stack;
+typedef struct stack_op {
+    node_op *head;
+} stack_op;
 
-void initialize_stack(Stack *stack);
+void initialize_stack(stack_op *stack);
 // basic operation for stack
 // push, pop, isempthy, etc, maybe also display all elements
 
-bool is_empthy(Stack *stack);
+bool is_empthy(stack_op *stack);
 
-void push(Stack *stack, char data);
+void push(stack_op *stack, char data);
 
-void pop(Stack *stack);
+void pop(stack_op *stack);
 
-char top(Stack *stack);
+char top(stack_op *stack);
 
 #endif

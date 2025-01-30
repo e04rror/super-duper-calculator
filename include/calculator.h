@@ -30,6 +30,7 @@ double addition_subtraction(double *numbers, char *operators, size_t number_oper
 
 double calculation(char *string);
 
+int precedence(char operat);
 #endif
 
 

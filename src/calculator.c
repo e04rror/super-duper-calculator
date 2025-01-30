@@ -1,4 +1,7 @@
 #include "calculator.h"
+#include "stack.h"
+#include "queue.h"
+#include "stack_numbers.h"
 #include <stdlib.h> // for exit and strtod
 #include <stdio.h> // for fprintf and stderr
 
@@ -31,6 +34,10 @@ bool check_multiply_division(char symbol){
 	return (symbol == '*' || symbol == '/');
 }
 
+bool check_add_sub(char symbol){
+    return (symbol == '+' || symbol == '-');
+}
+
 // for choosing  operation
 double (*ch_operation(char operator))(double, double){
 	switch(operator){
@@ -42,81 +49,119 @@ double (*ch_operation(char operator))(double, double){
 	}
 }
 
-
-double multi_division(double *numbers, char *operators, size_t number_operations){
-    size_t first_number = 0;
-    double (*operation)(double, double);
-    for(size_t i = 0; i < number_operations;i++){
-        if(check_multiply_division(operators[i])){
-            first_number++;
-            operation = ch_operation(operators[i]);
-            numbers[i+1] = operation(numbers[i], numbers[i+1]);
-            numbers[i +1 - first_number] = numbers[i+1];
-        }            
-        else {
-            first_number = 0;
-        }
+int precedence(char operat){
+    if(check_multiply_division(operat)){
+        return 1;
     }
-
-    return 0.0;
-}
-
-double addition_subtraction(double *numbers, char *operators, size_t number_operations){
-    double result = numbers[0];
-    double (*operation)(double, double);
-    for(size_t i = 0; i < number_operations; i++){
-        if(operators[i] == '+' || operators[i] == '-'){
-            operation = ch_operation(operators[i]);
-            result = operation(result, numbers[i+1]);
-        }
-    }
-    return result;
+        
+    return 0;
+    
 }
 
 double calculation(char *string){
-    const size_t MAX_AMOUNT = 50;
+    // i will change here, i know the code is messy 
+    char *current = string,
+         *end_number;
+    double number;
     
-    double number = 0.0f;  
-    char *current = string; 
-    char  *end_number; 
+    queue output;
+    initialize_queue(&output);
     
-    double numbers[MAX_AMOUNT];
-    char operations[MAX_AMOUNT];
-    size_t amount_numbers = 0, amount_operations = 0;
-    
+    stack_op operators;
+    initialize_stack(&operators);
+    bool check = false;
 
     while(*current != '\0'){
-
-       number = strtod(current, &end_number);
-       if(current != end_number){
-            numbers[amount_numbers++] = number;
-            current = end_number;
+        number = strtod(current, &end_number);
+        if(current != end_number){
             
-            if(ch_operation(*end_number)){
-                operations[amount_operations++] = *end_number;
+            // add the number to the queue
+            enqueue_double(&output, number);
+            current = end_number;
+            if(*current == ')'){
+                 while(!is_empthy(&operators) && top(&operators) != '('){
+                         enqueue_char(&output, top(&operators)); 
+                         pop(&operators);
+                    }
+                     pop(&operators);
+                     check = false;
+                     current++;
+                
+                if(ch_operation(*current)){
+                     while(!is_empthy(&operators) && precedence(top(&operators)) >= precedence(*current)){
+                        enqueue_char(&output, top(&operators));
+                        pop(&operators);
+                }
+
+                push(&operators, *current);
                 current++;
             }
-        } else if(ch_operation(*current)){ // what if someone enter the phrase like this "1+-/2"
-            operations[amount_operations] = *current; 
+            }else if(ch_operation(*current)){
+                while(!is_empthy(&operators) && precedence(top(&operators)) >= precedence(*current) && !check ){
+                    enqueue_char(&output, top(&operators));
+                    pop(&operators);
+                }
+
+                push(&operators, *current);
+                current++;
+    
+              }   
+        } else if(*current == '('){
+                push(&operators, *current);
+                check = true;
+                current++;
+        } else if(ch_operation(*current) ){
+                while(!is_empthy(&operators) && precedence(top(&operators)) >= precedence(*current) && !check){
+                    enqueue_char(&output, top(&operators));
+                    pop(&operators);
+                }
+		        push(&operators, *current);
+                current++;
+        }
+        else {
             current++;
-        
+        }
+      }       
+    
+    while(!is_empthy(&operators)){
+        enqueue_char(&output, top(&operators));
+        pop(&operators);
+    }
+    /*while(!is_empty(&output)){
+        if(output.front->type == DOUBLE){ double d = (output.front->data.num);
+        printf("the number %f\n", d);
         } else {
-            current++;
+           char cd = (output.front->data.op);
+           printf("the operator %c\n", cd);
         }
-    }
-    operations[amount_operations] = '\0';
+        dequeue(&output);
+    }*/
+    
+    stack_num res;
+    init_stack_num(&res);
 
-    for(size_t i = 0; i < amount_numbers;i++){
-        printf("%f ", numbers[i]);
-        if(operations[i]!= '\0'){
-            printf("%c", operations[i]); 
+    double (*operation)(double, double);
+    node_q *temp = get_front(&output);
+    double result; 
+    while(!is_empty(&output)){
+         if(temp->type == DOUBLE){
+            push_num(&res, temp->data.num);
+         } else if(temp->type == CHAR){
+            operation = ch_operation(temp->data.op);
+            
+            double temp1 = top_num(&res);
+            pop_num(&res);
+            
+            double temp2 = top_num(&res);
+            pop_num(&res);
+            
+            result = operation(temp2, temp1);
+            printf("Res: %f\n", result);
+            push_num(&res, result);
         }
-        printf("\n");
+        dequeue(&output);
+        temp = get_front(&output);
     }
-
-    double result = 0.0f;
-    result = multi_division(numbers, operations, amount_operations);
-    result = addition_subtraction(numbers, operations, amount_operations);
     
     return result;
 }

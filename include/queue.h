@@ -3,33 +3,38 @@
 
 #include <stdbool.h>
 
-enum data_type {
+typedef enum {
     CHAR = 1,
     DOUBLE = 2
-};
+} data_type;
 
 typedef struct node {
-    void *data;
-    int data_type;
+    union {
+        double num;
+        char op;
+    }data;
+    data_type type;
     struct node *next;
-} node;
+} node_q;
 
-typedef struct queue_results {
-    node *front, *rear;
-} queue_results;
+typedef struct queue {
+    node_q *front, *rear;
+} queue;
 
-node *create_node(void *data, int d_type);
+//node_q *create_node_q(void *data, int d_type);
 
-void initialize_queue(queue_results *queue);
+void initialize_queue(queue *q);
 
-bool is_empty(queue_results *queue);
+bool is_empty(queue *q);
 
-void enqueue(queue_results *queue,void *data, int d_type);
+void enqueue_double(queue *q, double data);
+void enqueue_char(queue *q, char op);
 
-void dequeue(queue_results *queue);
+void dequeue(queue *q);
 
-void *front(queue_results *queue);
+node_q *get_front(queue *q);
 
-void *rear(queue_results *queue);
+// for now, i don't need it
+//node_q rear(queue *q);
 
 #endif
