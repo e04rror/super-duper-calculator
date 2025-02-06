@@ -65,7 +65,6 @@ void dequeue(queue *q){
 
 node_q *get_front(queue *q){
     if(is_empty(q)){
-        printf("The queue is empthy!\n");
         return NULL;
     }
     return q->front;

@@ -1,7 +1,7 @@
 #include "calculator.h"
 #include "stack.h"
 #include "queue.h"
-#include "stack_numbers.h"
+// #include "stack_numbers.h"
 #include <stdlib.h> // for exit and strtod
 #include <stdio.h> // for fprintf and stderr
 
@@ -67,7 +67,7 @@ double calculation(char *string){
     queue output;
     initialize_queue(&output);
     
-    stack_op operators;
+    stack operators;
     initialize_stack(&operators);
     bool check = false;
 
@@ -79,8 +79,8 @@ double calculation(char *string){
             enqueue_double(&output, number);
             current = end_number;
             if(*current == ')'){
-                 while(!is_empthy(&operators) && top(&operators) != '('){
-                         enqueue_char(&output, top(&operators)); 
+                 while(!is_empthy(&operators) && top_char(&operators) != '('){
+                         enqueue_char(&output, top_char(&operators)); 
                          pop(&operators);
                     }
                      pop(&operators);
@@ -88,34 +88,34 @@ double calculation(char *string){
                      current++;
                 
                 if(ch_operation(*current)){
-                     while(!is_empthy(&operators) && precedence(top(&operators)) >= precedence(*current)){
-                        enqueue_char(&output, top(&operators));
+                     while(!is_empthy(&operators) && precedence(top_char(&operators)) >= precedence(*current)){
+                        enqueue_char(&output, top_char(&operators));
                         pop(&operators);
                 }
 
-                push(&operators, *current);
+                push_char(&operators, *current);
                 current++;
             }
             }else if(ch_operation(*current)){
-                while(!is_empthy(&operators) && precedence(top(&operators)) >= precedence(*current) && !check ){
-                    enqueue_char(&output, top(&operators));
+                while(!is_empthy(&operators) && precedence(top_char(&operators)) >= precedence(*current) && !check ){
+                    enqueue_char(&output, top_char(&operators));
                     pop(&operators);
                 }
 
-                push(&operators, *current);
+                push_char(&operators, *current);
                 current++;
     
               }   
         } else if(*current == '('){
-                push(&operators, *current);
+                push_char(&operators, *current);
                 check = true;
                 current++;
         } else if(ch_operation(*current) ){
-                while(!is_empthy(&operators) && precedence(top(&operators)) >= precedence(*current) && !check){
-                    enqueue_char(&output, top(&operators));
+                while(!is_empthy(&operators) && precedence(top_char(&operators)) >= precedence(*current) && !check){
+                    enqueue_char(&output, top_char(&operators));
                     pop(&operators);
                 }
-		        push(&operators, *current);
+		        push_char(&operators, *current);
                 current++;
         }
         else {
@@ -124,40 +124,31 @@ double calculation(char *string){
       }       
     
     while(!is_empthy(&operators)){
-        enqueue_char(&output, top(&operators));
+        enqueue_char(&output, top_char(&operators));
         pop(&operators);
     }
-    /*while(!is_empty(&output)){
-        if(output.front->type == DOUBLE){ double d = (output.front->data.num);
-        printf("the number %f\n", d);
-        } else {
-           char cd = (output.front->data.op);
-           printf("the operator %c\n", cd);
-        }
-        dequeue(&output);
-    }*/
     
-    stack_num res;
-    init_stack_num(&res);
+    stack numbers;
+    initialize_stack(&numbers);
 
     double (*operation)(double, double);
     node_q *temp = get_front(&output);
     double result; 
     while(!is_empty(&output)){
          if(temp->type == DOUBLE){
-            push_num(&res, temp->data.num);
+            push_double(&numbers, temp->data.num);
          } else if(temp->type == CHAR){
             operation = ch_operation(temp->data.op);
             
-            double temp1 = top_num(&res);
-            pop_num(&res);
+            double temp1 = top_double(&numbers);
+            pop(&numbers);
             
-            double temp2 = top_num(&res);
-            pop_num(&res);
+            double temp2 = top_double(&numbers);
+            pop(&numbers);
             
             result = operation(temp2, temp1);
             printf("Res: %f\n", result);
-            push_num(&res, result);
+            push_double(&numbers, result);
         }
         dequeue(&output);
         temp = get_front(&output);
