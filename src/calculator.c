@@ -1,7 +1,6 @@
 #include "calculator.h"
 #include "stack.h"
 #include "queue.h"
-// #include "stack_numbers.h"
 #include <stdlib.h> // for exit and strtod
 #include <stdio.h> // for fprintf and stderr
 
@@ -105,7 +104,7 @@ double calculation(char *string){
                 push_char(&operators, *current);
                 current++;
     
-              }   
+              }  
         } else if(*current == '('){
                 push_char(&operators, *current);
                 check = true;
@@ -134,6 +133,7 @@ double calculation(char *string){
     double (*operation)(double, double);
     node_q *temp = get_front(&output);
     double result; 
+    
     while(!is_empty(&output)){
          if(temp->type == DOUBLE){
             push_double(&numbers, temp->data.num);
