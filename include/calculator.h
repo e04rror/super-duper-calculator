@@ -2,7 +2,7 @@
 #define CALCULATOR_H
 
 #include <stdbool.h>
-
+#include <stddef.h>
 // for addition
 double add(double augend, double addend);
 
@@ -21,8 +21,16 @@ bool check_multiply_division(char symbol);
 // for choosing operation
 double (*ch_operation(char operator))(double, double);
 
-double calculation(int argc, char **argv);
+// for calculating multiplication and division
+//double calculate_multi_div(double *arr_numbers, char *arr_char, size_t *begin_index);
 
+double multi_division(double *numbers, char *operators, size_t number_operations);
+
+double addition_subtraction(double *numbers, char *operators, size_t number_operations);
+
+double calculation(char *string);
+
+int precedence(char operat);
 #endif
 
 
