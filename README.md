@@ -14,7 +14,7 @@ The program reads the string of operands and operators from the command line arg
 
 If you are using parentheses '(', ')' or the multiplication symbol '*', you will need to escape them to prevent them from being interpreted by the shell:
 
-./calc '\'(1 '\'* 2'\') + 5
+./calc \\(1 \\* 2\\) + 5
 
 ## Future improvements
 * Switching from command line arguments to interactive mode 
